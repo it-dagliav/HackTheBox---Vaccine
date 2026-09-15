@@ -116,10 +116,7 @@ export TERM=xterm
 /var/lib/postgresql/user.txt
 ```
 
-Файл с паролем от `postgres` находится в каталоге:
-```TEXT
-/var/www/html/dashboard.php:
-```
+Файл с паролем от `postgres` находится в каталоге `/var/www/html/dashboard.php`
 ```php
 $conn = pg_connect("host=localhost port=5432 dbname=carsdb user=postgres password=P@s5w0rd!");
 ```
