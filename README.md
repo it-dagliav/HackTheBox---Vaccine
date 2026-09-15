@@ -52,6 +52,7 @@ ftp> ls
 Ответ: backup.zip
 
 4. What script comes with the John The Ripper toolset and generates a hash from a password protected zip archive in a format to allow for cracking attempts?
+
 Ответ: zip2john
 
 ## Получение первоначального доступа (Initial Access)
