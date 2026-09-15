@@ -17,12 +17,13 @@ nmap -sV 10.129.209.236
 ```
 
 ### Результат
-
+```TEXT
 PORT   STATE    SERVICE VERSION
 21/tcp open     ftp     vsftpd 3.0.3
 22/tcp open     ssh     OpenSSH 8.0p1 Ubuntu 6ubuntu0.1 (Ubuntu Linux; protocol 2.0)
 53/tcp filtered domain
 80/tcp open     http    Apache httpd 2.4.41
+```
 
 ### Анализ
 Решение по шагам:
