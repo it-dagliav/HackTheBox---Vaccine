@@ -44,10 +44,11 @@ ftp 10.129.209.236
 ```
 
 Подключаемся с помощью логина `anonymous`.
-Просмотр директории:
+* Просмотр директории:
+```TEXT
 ftp> ls
 -rwxr-xr-x    1 0        0            2533 Apr 13  2021 backup.zip
-
+```
 Ответ: backup.zip
 
 4. What script comes with the John The Ripper toolset and generates a hash from a password protected zip archive in a format to allow for cracking attempts?
